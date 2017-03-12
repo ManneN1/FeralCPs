@@ -14,7 +14,7 @@ The "shine" fade-in has been removed in favour of faster response time!
 # Warning
 
 When disabling this AddOn you will need to either manually type (in-game chat) "/run SetCVar("comboPointLocation", X)", where X is replaced by either 1 or 2 depending on which
-combo point frame you prefer (1 for Legion frame, 2 for default classic frame) OR you can type /fcp disable X before uninstalling/disabling the addon. Make sure your WoW folder is not
+combo point frame you prefer (1 for Legion frame, 2 for default classic frame) OR you can type "/fcp disable X" before uninstalling/disabling the addon. Make sure your WoW folder is not
 set to read-only as if so it will not save the updates.
 # Usage
 
