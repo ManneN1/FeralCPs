@@ -1,0 +1,100 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="FeralCPs.lua"/>
+	<Frame name="FCPTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="12" y="12"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ComboFrame\ComboPoint">
+					<Size>
+						<AbsDimension x="12" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.375" top="0" bottom="1"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Highlight" file="Interface\ComboFrame\ComboPoint">
+					<Size>
+						<AbsDimension x="8" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="2" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.375" right="0.5625" top="0" bottom="1"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="FeralComboFrame" frameStrata="MEDIUM" toplevel="true" parent="UIParent" hidden="true" alpha="0">
+		<Size>
+			<AbsDimension x="256" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="TargetFrame">
+				<Offset>
+					<AbsDimension x="-44" y="-9"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="FCP1" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-9" y="6"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP2" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="0" y="0"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP3" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="7" y="-8"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP4" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="12" y="-19"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP5" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="14" y="-30"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP6" parentArray="ComboPoints" inherits="FCPTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="12" y="-41"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP7" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="24" y="-33"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP8" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="24" y="-22"/>
+				</Anchors>
+			</Frame>
+			<Frame name="FCP9" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="20" y="-12"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad function="FeralComboFrame_OnLoad"/>
+			<OnEvent function="FeralComboFrame_OnEvent"/>
+		</Scripts>
+	</Frame>
+</Ui>
