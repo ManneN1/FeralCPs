@@ -25,10 +25,11 @@ local feralfinishers = {
   [1079]  = true, -- Rip
   [22568] = true, -- Ferocious Bite
   [52610] = true, -- Savage Roar
+  [22570] = true, -- Maim
 }
 
 local feralaoe = {
---[SPELLID] = {CP, TIME_SINCE}
+--[SPELLID] = {CP, TIME}
   [202028] = {1, 0}, -- Brutal Slash
   [106830] = {1, 0}, -- Thrash
   [106785] = {1, 0}, -- Swipe
@@ -72,6 +73,7 @@ function init()
   ShowPoints(CPs);
   
   -- Register Events
+  FeralComboFrame:RegisterEvent("LOADING_SCREEN_DISABLED"); -- fixes some arena related combo point reset bug
 	FeralComboFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
   FeralComboFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player");
   FeralComboFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
@@ -81,8 +83,12 @@ end
 
 function FeralComboFrame_OnEvent(self, event, ...)
   if ( event == "PLAYER_TARGET_CHANGED" ) then
-      local comboPoints = logCPs and CPs or UnitPower(PlayerFrame.unit, 4)
-      ShowFeralComboFrame(comboPoints);     
+    local comboPoints = CPs or UnitPower(PlayerFrame.unit, 4)
+    ShowFeralComboFrame(comboPoints);     
+  elseif ( event == "LOADING_SCREEN_DISABLED") then
+    -- Sometimes CPs reset (entering arenas for example) after loading screen
+    CPs = min(CPs, UnitPower(PlayerFrame.unit, 4))
+    ShowPoints(CPs);
   elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED") then
     local time, event,_,_,src,_,_,_,_ ,_,_,id = ...
     if (not src or not UnitIsUnit(src, PlayerFrame.unit)) then
