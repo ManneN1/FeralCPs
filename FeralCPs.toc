@@ -1,4 +1,4 @@
-## Interface: 71500
+## Interface: 83000
 ## Title: FeralCPs
 ## Notes: A Combo Point addon that tracks combo points accurately for Ferals using the old combo point frame.
 ## Author: ManneN1

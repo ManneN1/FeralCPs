@@ -48,47 +48,27 @@
 		<Frames>
 			<Frame name="FCP1" parentArray="ComboPoints" inherits="FCPTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="-9" y="6"/>
+					<Anchor point="TOPRIGHT" x="0" y="0"/>
 				</Anchors>
 			</Frame>
 			<Frame name="FCP2" parentArray="ComboPoints" inherits="FCPTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="0"/>
+					<Anchor point="TOPRIGHT" x="7" y="-8"/>
 				</Anchors>
 			</Frame>
 			<Frame name="FCP3" parentArray="ComboPoints" inherits="FCPTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="7" y="-8"/>
+					<Anchor point="TOPRIGHT" x="12" y="-19"/>
 				</Anchors>
 			</Frame>
 			<Frame name="FCP4" parentArray="ComboPoints" inherits="FCPTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="12" y="-19"/>
+					<Anchor point="TOPRIGHT" x="14" y="-30"/>
 				</Anchors>
 			</Frame>
 			<Frame name="FCP5" parentArray="ComboPoints" inherits="FCPTemplate">
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="14" y="-30"/>
-				</Anchors>
-			</Frame>
-			<Frame name="FCP6" parentArray="ComboPoints" inherits="FCPTemplate">
-				<Anchors>
 					<Anchor point="TOPRIGHT" x="12" y="-41"/>
-				</Anchors>
-			</Frame>
-			<Frame name="FCP7" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="24" y="-33"/>
-				</Anchors>
-			</Frame>
-			<Frame name="FCP8" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="24" y="-22"/>
-				</Anchors>
-			</Frame>
-			<Frame name="FCP9" parentArray="ComboPoints" inherits="FCPTemplate" alpha="0.6">
-				<Anchors>
-					<Anchor point="TOPRIGHT" x="20" y="-12"/>
 				</Anchors>
 			</Frame>
 		</Frames>

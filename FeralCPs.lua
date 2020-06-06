@@ -10,22 +10,21 @@ FERAL_COMBOFRAME_FADE_OUT = 0;
 
 ---------------------------------------------------
 
-local CPs
+local cps
 local feralbuilders = {
   [1822]   = 1, -- Rake
-  [210722] = 3, -- Ashamane's Frenzy
+  [274837] = 5, -- Feral Frenzy
   [5221]   = 1, -- Shred
-  [155625] = 1, -- Moonfire
-  [202060] = 5, -- Elune's Guidance
-  [139546] = 1, -- Elune's Guidance Tick
-  [16953]  = 1, -- Primal Fury (crits)
+  [155625] = 1, -- Moonfire (Feral)
+  [16953]  = 1, -- Primal Fury (crits extra cps)
 }
 
 local feralfinishers = {
-  [1079]  = true, -- Rip
-  [22568] = true, -- Ferocious Bite
-  [52610] = true, -- Savage Roar
-  [22570] = true, -- Maim
+  [1079]  	= true, -- Rip
+  [22568] 	= true, -- Ferocious Bite
+  [52610] 	= true, -- Savage Roar
+  [22570] 	= true, -- Maim
+  [285381]	= true, -- Primal Wrath
 }
 
 local feralaoe = {
@@ -38,133 +37,177 @@ local feralaoe = {
 ---------------------------------------------------
 
 function FeralComboFrame_OnLoad(self)
-  print("FeralCPs loaded")
+	print("FeralCPs loaded")
 	init();
 end
 
 function init()
-
-  if (GetCVar("comboPointLocation") ~= "0") then
+	
+	if (GetCVar("comboPointLocation") ~= "0") then
 		FeralComboFrame:Hide();
 		return;
-  else
-    FeralComboFrame:Show();
+	else
+		FeralComboFrame:Show();
+	end
+	
+	
+	cps = UnitPower(PlayerFrame.unit, 4);
+	
+	
+	-- Init the necessary combo points
+	for i = 1, 5 do
+		FeralComboFrame.ComboPoints[i].Highlight:SetAlpha(0);
 	end
   
+	-- Show points
+	ShowPoints(cps);
   
-  CPs = UnitPower(PlayerFrame.unit, 4);
-  
-  
-	-- First hide uneccesary combo points
-	for i = 7, 9 do
-		FeralComboFrame.ComboPoints[i]:Hide();
-    FeralComboFrame.ComboPoints[i].Highlight:SetAlpha(0);
-	end
-  FeralComboFrame.ComboPoints[1]:Hide()
-  FeralComboFrame.ComboPoints[1].Highlight:SetAlpha(0);
-  
-  -- Init the necessary combo points
-  for i = 2, 6 do
-    FeralComboFrame.ComboPoints[i].Highlight:SetAlpha(0);
-  end
-  
-  
-  -- Show points
-  ShowPoints(CPs);
-  
-  -- Register Events
-  FeralComboFrame:RegisterEvent("LOADING_SCREEN_DISABLED"); -- fixes some arena related combo point reset bug
+	-- Register Events
+	FeralComboFrame:UnregisterAllEvents();
+	FeralComboFrame:RegisterEvent("LOADING_SCREEN_DISABLED"); -- fixes some arena related combo point reset bug
 	FeralComboFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
-  FeralComboFrame:RegisterUnitEvent("UNIT_POWER_FREQUENT", "player");
-  FeralComboFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-  
-
+	FeralComboFrame:RegisterUnitEvent("UNIT_POWER_UPDATE", "player");
+	FeralComboFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
+	
 end
 
 function FeralComboFrame_OnEvent(self, event, ...)
-  if ( event == "PLAYER_TARGET_CHANGED" ) then
-    local comboPoints = CPs or UnitPower(PlayerFrame.unit, 4)
-    ShowFeralComboFrame(comboPoints);     
-  elseif ( event == "LOADING_SCREEN_DISABLED") then
-    -- Sometimes CPs reset (entering arenas for example) after loading screen
-    CPs = min(CPs, UnitPower(PlayerFrame.unit, 4))
-    ShowPoints(CPs);
-  elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED") then
-    local time, event,_,_,src,_,_,_,_ ,_,_,id = ...
-    if (not src or not UnitIsUnit(src, PlayerFrame.unit)) then
-      return
-    end
-    if ( event == "SPELL_ENERGIZE"  and feralbuilders[id] ~= nil ) then
-      CPs = min(5, CPs + feralbuilders[id])
-      ShowPoints(CPs)
-   elseif ( event == "SPELL_CAST_SUCCESS" and feralfinishers[id]) then
-     CPs = 0
-     ShowPoints(CPs)
-   elseif ( event == "SPELL_DAMAGE" and feralaoe[id]) then
-     if (not feralaoe[id][2] or feralaoe[id][2] ~= time) then
-       feralaoe[id][2] = time
-       CPs = min(5, CPs + feralaoe[id][1])
-       ShowPoints(CPs)
-     end
-   end
-	elseif ( event == "UNIT_POWER_FREQUENT" ) then 
-    unit, powertype = ... 
-    if (powertype == "COMBO_POINTS" and unit == "player") then
-      if ( UnitAffectingCombat("player") ) then
-        return
-      end
-      local comboPoints = GetComboPoints(PlayerFrame.unit, "target");
-      ShowPoints(comboPoints)
-    end
-  end
+	
+	if ( event == "PLAYER_TARGET_CHANGED" ) then
+		
+		cps = cps or UnitPower(PlayerFrame.unit, 4)
+		ShowPoints(cps);     
+
+	elseif ( event == "LOADING_SCREEN_DISABLED") then
+
+		-- Sometimes cps reset (entering arenas for example) after loading screen
+		cps = min(cps, UnitPower(PlayerFrame.unit, 4))
+		ShowPoints(cps);
+
+	elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED") then
+
+		local time, event,_,_,src,_,_,_,_ ,_,_,id = CombatLogGetCurrentEventInfo()
+		
+		if (not src or not UnitIsUnit(src, PlayerFrame.unit)) then
+			return
+		end
+		
+		if ( (event == "SPELL_CAST_SUCCESS") and feralbuilders[id] ~= nil ) then
+
+			cps = min(5, cps + feralbuilders[id])
+			ShowPoints(cps)
+
+		elseif ( event == "SPELL_CAST_SUCCESS" and feralfinishers[id]) then
+
+			cps = 0
+			ShowPoints(cps)
+
+		elseif ( event == "SPELL_DAMAGE" and feralaoe[id]) then
+	
+			if (not feralaoe[id][2] or feralaoe[id][2] ~= time) then
+
+				feralaoe[id][2] = time
+				cps = min(5, cps + feralaoe[id][1])
+				ShowPoints(cps)
+			
+			end
+		
+		end
+	elseif ( event == "UNIT_POWER_UPDATE" ) then 
+		
+		-- You drop combo points out of combat (one every 30 seconds)
+		if ( UnitAffectingCombat("player") ) then
+				return
+			end
+		
+		unit, powertype = ... 
+		
+		if (powertype == "COMBO_POINTS" and unit == PlayerFrame.unit) then
+			if (UnitPower(PlayerFrame.unit, 4) < cps) then
+
+				cps = UnitPower(PlayerFrame.unit, 4);
+				ShowPoints(cps)
+			end
+		end
+	end
 end
 
-function ShowPoints(ComboPoints)
-  local comboPoint; 
-  ShowFeralComboFrame(ComboPoints);
+function ShowPoints(cps)
+
+	ShowFeralComboFrame(cps);
+	
+	local comboPointFrame
   
-  for i= 2, 6 do
-      comboPoint = FeralComboFrame.ComboPoints[i];
-      if ( comboPoint.Highlight:GetAlpha() == 1 and ComboPoints < i-1 ) then
-        comboPoint.Highlight:SetAlpha(0)
-      elseif ( comboPoint.Highlight:GetAlpha() ~= 1 and ComboPoints >= i-1 ) then
-        comboPoint.Highlight:SetAlpha(1)
-      end
-  end
+	for i=1,5 do
+		
+		comboPointFrame = FeralComboFrame.ComboPoints[i];
+		
+		if ( comboPointFrame.Highlight:GetAlpha() == 1 and cps < i-1 ) then
+		
+			comboPointFrame.Highlight:SetAlpha(0)
+		
+		elseif ( comboPointFrame.Highlight:GetAlpha() ~= 1 and cps >= i-1 ) then
+		
+			comboPointFrame.Highlight:SetAlpha(1)
+		
+		end
+		
+	end
+	
 end
 
-function ShowFeralComboFrame(comboPoints)
-  FeralComboFrame.visible = FeralComboFrame.visible or false   
-  if ( comboPoints > 0 and not FeralComboFrame.visible and UnitExists("target") ) then
-    FeralComboFrame:Show()
-    FeralComboFrame.visible = true
-    UIFrameFadeIn(FeralComboFrame, FERAL_COMBOFRAME_FADE_IN)
-  elseif ( FeralComboFrame.visible and ( comboPoints == 0 or not UnitExists("target") ) ) then
-    FeralComboFrame:Hide()
-    FeralComboFrame.visible = false
-    UIFrameFadeOut(FeralComboFrame, FERAL_COMBOFRAME_FADE_OUT)
-  end
+function ShowFeralComboFrame(cps)
+	
+	FeralComboFrame.visible = FeralComboFrame.visible or false   
+	
+	if ( cps > 0 and not FeralComboFrame.visible and UnitExists("target") ) then
+	
+		FeralComboFrame:Show()
+		FeralComboFrame.visible = true
+		UIFrameFadeIn(FeralComboFrame, FERAL_COMBOFRAME_FADE_IN)
+	
+	elseif ( FeralComboFrame.visible and ( cps == 0 or not UnitExists("target") ) ) then
+	
+		FeralComboFrame:Hide()
+		FeralComboFrame.visible = false
+		UIFrameFadeOut(FeralComboFrame, FERAL_COMBOFRAME_FADE_OUT)
+		
+	end
+	
 end
 
 SLASH_FERALCP1, SLASH_FERALCP2 = '/feralcp', '/fcp'; 
 function SlashCmdList.FERALCP(msg, editbox)
-  msg = string.lower(msg)
- if msg:trim() == "enable" then
-    if (GetCVar("comboPointLocation") ~= 0) then
-      SetCVar("comboPointLocation", 0);
-      ReloadUI();
-    end
-  end
-  local words = {}
-  for word in msg:gmatch("%w+") do table.insert(words, word) print(word) end
-  if words[1] == "disable" then
-      print("disabling")
-      if words[2] == "1" or words[2] == "2" then
-        SetCVar("comboPointLocation", tonumber(words[2]), words[2])
-        print("Changed CVAR")
-        FeralComboFrame:Hide()
-        FeralComboFrame:UnregisterAllEvents();
-        ReloadUI();
-      end
-  end
+	
+	msg = string.lower(msg)
+	
+	if msg:trim() == "enable" then
+		
+		if (GetCVar("comboPointLocation") ~= 0) then
+		
+			SetCVar("comboPointLocation", 0);
+			ReloadUI();
+		
+		end
+		
+	end
+	
+	local words = {}
+	for word in msg:gmatch("%w+") do table.insert(words, word) print(word) end
+	
+	if words[1] == "disable" then
+		
+		if words[2] == "1" or words[2] == "2" then
+			
+			print("Disabling FCP")
+			SetCVar("comboPointLocation", tonumber(words[2]), words[2])
+			FeralComboFrame:Hide()
+			FeralComboFrame:UnregisterAllEvents();
+			ReloadUI();
+			
+		else
+			print("You did not add a new position for the combo point frame, select 1 for target and 2 for player.")
+		end
+		
+	end
 end
