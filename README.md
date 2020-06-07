@@ -34,5 +34,5 @@ It might however look weird seeing as the default "shine" has been removed.
 # Disclaimer
 
 This AddOn will break your ComboPoints frame on fights like Malygos (last phase) and running the "/fcp disable 2" command is recommended before participating in fights
-like these. I am not responsible for your wipes nor your broken UI when you uninstall this AddOn.
+like these. I am not responsible for your wipes nor your broken UI when you uninstall/use this AddOn without following the instructions.
 

@@ -91,7 +91,7 @@ function FeralComboFrame_OnEvent(self, event, ...)
 		if (not src or not UnitIsUnit(src, PlayerFrame.unit)) then
 			return
 		end
-		
+
 		if ( (event == "SPELL_CAST_SUCCESS") and feralbuilders[id] ~= nil ) then
 
 			cps = min(5, cps + feralbuilders[id])
@@ -103,7 +103,7 @@ function FeralComboFrame_OnEvent(self, event, ...)
 			ShowPoints(cps)
 
 		elseif ( event == "SPELL_DAMAGE" and feralaoe[id]) then
-	
+
 			if (not feralaoe[id][2] or feralaoe[id][2] ~= time) then
 
 				feralaoe[id][2] = time
@@ -142,11 +142,11 @@ function ShowPoints(cps)
 		
 		comboPointFrame = FeralComboFrame.ComboPoints[i];
 		
-		if ( comboPointFrame.Highlight:GetAlpha() == 1 and cps < i-1 ) then
+		if ( comboPointFrame.Highlight:GetAlpha() == 1 and cps < i ) then
 		
 			comboPointFrame.Highlight:SetAlpha(0)
 		
-		elseif ( comboPointFrame.Highlight:GetAlpha() ~= 1 and cps >= i-1 ) then
+		elseif ( comboPointFrame.Highlight:GetAlpha() ~= 1 and cps >= i ) then
 		
 			comboPointFrame.Highlight:SetAlpha(1)
 		
