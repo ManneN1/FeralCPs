@@ -6,7 +6,7 @@ In Legion the classic ComboPoint frame was replaced by a new ComboPoint frame, h
 still available in the code (using CVar comboPointLocation), but ever since Legion it is riddled with bugs. this
 AddOn attempts to fix those issues by re-creating the default "old" comboPoint look from the ground up.
 
-FeralCPs uses the event COMBAT_LOG_EVENT_UNFILTERED (sub-events DAMAGE_SUCCESS and SPELL_CAST_SUCCESS), PLAYER_TARGET_CHANGED and UNIT_POWER_UPDATE
+FeralCPs uses the event COMBAT_LOG_EVENT_UNFILTERED (sub-events SPELL_DAMAGE, SPELL_ABSORBED, SPELL_DRAIN, SPELL_ENERGIZE, and SPELL_CAST_SUCCESS), PLAYER_TARGET_CHANGED and UNIT_POWER_UPDATE
 to track your combo points accurately.
 
 The "shine" fade-in effect has been removed in favour of faster response time.

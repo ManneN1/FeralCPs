@@ -3,7 +3,7 @@
 
 
 -- Customize these for more Blizzard-like behaviour
--- No shine exists so it might look whacky
+-- There's no shine so it might look whacky
 
 FERAL_COMBOFRAME_FADE_IN = 0;
 FERAL_COMBOFRAME_FADE_OUT = 0;
@@ -11,27 +11,21 @@ FERAL_COMBOFRAME_FADE_OUT = 0;
 ---------------------------------------------------
 
 local cps
-local feralbuilders = {
-  [1822]   = 1, -- Rake
-  [274837] = 5, -- Feral Frenzy
-  [5221]   = 1, -- Shred
-  [155625] = 1, -- Moonfire (Feral)
-  [16953]  = 1, -- Primal Fury (crits extra cps)
-}
-
-local feralfinishers = {
-  [1079]  	= true, -- Rip
-  [22568] 	= true, -- Ferocious Bite
-  [52610] 	= true, -- Savage Roar
-  [22570] 	= true, -- Maim
-  [285381]	= true, -- Primal Wrath
-}
-
-local feralaoe = {
---[SPELLID] = {CP, TIME}
-  [202028] = {1, 0}, -- Brutal Slash
-  [106830] = {1, 0}, -- Thrash
-  [106785] = {1, 0}, -- Swipe
+local feralabilities = {
+  [1822]   = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1}, 										-- Rake
+  [274838] = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1}, 										-- Feral Frenzy
+  [5221]   = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1}, 										-- Shred
+  [155625] = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1}, 										-- Moonfire (Feral)
+  [16953]  = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1},						 				-- Primal Fury (crits extra cps)
+  [279471] = {subEvents = {["SPELL_ENERGIZE"] = true}, comboPoints = 1}, 										-- Gushing Laceration (Rip Azerite Trait)
+  [1079]   = {subEvents = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REFRESH"] = true}, comboPoints = -5}, 	-- Rip										-- Rip
+  [22568]  = {subEvents = {["SPELL_DAMAGE"] = true, ["SPELL_ABSORBED"] = true}, comboPoints = -5},			 	-- Ferocious Bite
+  [52610]  = {subEvents = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REFRESH"] = true}, comboPoints = -5}, 	-- Savage Roar
+  [22570]  = {subEvents = {["SPELL_DAMAGE"] = true, ["SPELL_ABSORBED"] = true}, comboPoints = -5}, 				-- Maim
+  [285381] = {subEvents = {["SPELL_CAST_SUCCESS"] = true}, comboPoints = -5}, 									-- Primal Wrath
+  [202028] = {subEvents = {["SPELL_DAMAGE"] = true, ["SPELL_ABSORBED"] = true}, comboPoints = 1, time = 0}, 	-- Brutal Slash
+  [106830] = {subEvents = {["SPELL_DAMAGE"] = true, ["SPELL_ABSORBED"] = true}, comboPoints = 1, time = 0}, 	-- Thrash
+  [106785] = {subEvents = {["SPELL_DAMAGE"] = true, ["SPELL_ABSORBED"] = true}, comboPoints = 1, time = 0},	 	-- Swipe
 }
 
 ---------------------------------------------------
@@ -86,33 +80,32 @@ function FeralComboFrame_OnEvent(self, event, ...)
 
 	elseif ( event == "COMBAT_LOG_EVENT_UNFILTERED") then
 
-		local time, event,_,_,src,_,_,_,_ ,_,_,id = CombatLogGetCurrentEventInfo()
+		local t, event,_,_,src,_,_,_,_ ,_,_,id,name = CombatLogGetCurrentEventInfo()
 		
 		if (not src or not UnitIsUnit(src, PlayerFrame.unit)) then
 			return
 		end
-
-		if ( (event == "SPELL_CAST_SUCCESS") and feralbuilders[id] ~= nil ) then
-
-			cps = min(5, cps + feralbuilders[id])
-			ShowPoints(cps)
-
-		elseif ( event == "SPELL_CAST_SUCCESS" and feralfinishers[id]) then
-
-			cps = 0
-			ShowPoints(cps)
-
-		elseif ( event == "SPELL_DAMAGE" and feralaoe[id]) then
-
-			if (not feralaoe[id][2] or feralaoe[id][2] ~= time) then
-
-				feralaoe[id][2] = time
-				cps = min(5, cps + feralaoe[id][1])
-				ShowPoints(cps)
+		
+		-- DEBUG
+		--if (strfind(event, "SPELL") and (feralabilities[id] ~= nil) and not strfind(event, "PERIODIC")) then
+		--	print(event)
+		--	print(id)
+		--	print(name)
+		--end
+		
+		if feralabilities[id] and feralabilities[id].subEvents[event] and 
+			((feralabilities[id].time ~= nil and feralabilities[id].time ~= t) 
+				or feralabilities[id].time == nil) then
 			
+			if (feralabilities[id].time ~= nil) then 
+				feralabilities[id].time = t 
 			end
+			
+			cps = max(0, min(5, cps + feralabilities[id].comboPoints))
+			ShowPoints(cps)
 		
 		end
+		
 	elseif ( event == "UNIT_POWER_UPDATE" ) then 
 		
 		-- You drop combo points out of combat (one every 30 seconds)
@@ -180,6 +173,8 @@ SLASH_FERALCP1, SLASH_FERALCP2 = '/feralcp', '/fcp';
 function SlashCmdList.FERALCP(msg, editbox)
 	
 	msg = string.lower(msg)
+	local words = {}
+	for word in msg:gmatch("%w+") do table.insert(words, word) end
 	
 	if msg:trim() == "enable" then
 		
@@ -190,17 +185,12 @@ function SlashCmdList.FERALCP(msg, editbox)
 		
 		end
 		
-	end
-	
-	local words = {}
-	for word in msg:gmatch("%w+") do table.insert(words, word) print(word) end
-	
-	if words[1] == "disable" then
-		
+	elseif words[1] == "disable" then
+	 	
 		if words[2] == "1" or words[2] == "2" then
 			
 			print("Disabling FCP")
-			SetCVar("comboPointLocation", tonumber(words[2]), words[2])
+			SetCVar("comboPointLocation", tonumber(words[2]))
 			FeralComboFrame:Hide()
 			FeralComboFrame:UnregisterAllEvents();
 			ReloadUI();
@@ -208,6 +198,7 @@ function SlashCmdList.FERALCP(msg, editbox)
 		else
 			print("You did not add a new position for the combo point frame, select 1 for target and 2 for player.")
 		end
-		
+	else
+		print("Valid commands include: enable, disable x.(where x is a number either 1 or 2)")
 	end
 end
